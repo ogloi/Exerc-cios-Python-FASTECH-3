@@ -1,0 +1,64 @@
+ENTRADA = "exame.txt"
+
+
+def ler_nota(mensagem):
+    """Pede uma nota entre 0 e 10 e repete até o usuário digitar um valor válido."""
+    while True:
+        texto = input(mensagem).strip().replace(",", ".")
+        try:
+            nota = float(texto)
+        except ValueError:
+            print("  Valor inválido. Digite um número (ex.: 6.5).")
+            continue
+        if 0 <= nota <= 10:
+            return nota
+        print("  A nota deve estar entre 0 e 10.")
+
+
+def main():
+    try:
+        with open(ENTRADA, "r", encoding="utf-8") as arq:
+            linhas = arq.readlines()
+    except FileNotFoundError:
+        print(f"Arquivo {ENTRADA} não encontrado. Execute o programa 2 primeiro.")
+        return
+
+    alunos = [linha.strip() for linha in linhas if linha.strip()]
+    if not alunos:
+        print("Nenhum aluno em exame.")
+        return
+
+    print("=== Notas do exame ===")
+
+    with open("aprovados.txt", "a", encoding="utf-8") as f_aprov, \
+         open("reprovados.txt", "a", encoding="utf-8") as f_reprov:
+
+        for linha in alunos:
+            campos = linha.split(";")
+            nome = campos[0]
+            n1, n2, n3 = campos[1], campos[2], campos[3]
+            media_anterior = float(campos[4])
+
+            print(f"\nAluno: {nome} (média anterior: {media_anterior:.2f})")
+            nota_exame = ler_nota("Nota do exame: ")
+
+            media_final = (media_anterior + nota_exame) / 2
+
+            if media_final >= 5:
+                legenda = "Aprovado após exame"
+                destino = f_aprov
+            else:
+                legenda = "Reprovado após exame"
+                destino = f_reprov
+
+            destino.write(
+                f"{nome};{n1};{n2};{n3};{media_anterior:.2f};"
+                f"{nota_exame};{media_final:.2f};{legenda}\n"
+            )
+            print(f"  Média final: {media_final:.2f} -> {legenda}")
+
+    print("\nResultados do exame gravados em aprovados.txt e reprovados.txt.")
+
+
+if __name__ == "__main__":
+    main()
