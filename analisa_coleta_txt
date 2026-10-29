@@ -1,0 +1,65 @@
+ENTRADA = "notas.txt"
+
+
+def classificar(media):
+    if media >= 7:
+        return "Aprovado"
+    if media >= 5:
+        return "Exame"
+    return "Reprovado"
+
+
+def main():
+    try:
+        with open(ENTRADA, "r", encoding="utf-8") as arq:
+            linhas = arq.readlines()
+    except FileNotFoundError:
+        print(f"Arquivo {ENTRADA} não encontrado. Execute o programa 1 primeiro.")
+        return
+
+    aprovados, exame, reprovados = [], [], []
+
+    for numero, linha in enumerate(linhas, start=1):
+        linha = linha.strip()
+        if not linha:
+            continue
+
+        campos = linha.split(";")
+        if len(campos) != 4:
+            print(f"Linha {numero} ignorada (formato inválido): {linha}")
+            continue
+
+        try:
+            nome = campos[0]
+            n1, n2, n3 = float(campos[1]), float(campos[2]), float(campos[3])
+        except ValueError:
+            print(f"Linha {numero} ignorada (nota inválida): {linha}")
+            continue
+
+        media = (n1 + n2 + n3) / 3
+        situacao = classificar(media)
+        registro = f"{nome};{n1};{n2};{n3};{media:.2f};{situacao}\n"
+
+        if situacao == "Aprovado":
+            aprovados.append(registro)
+        elif situacao == "Exame":
+            exame.append(registro)
+        else:
+            reprovados.append(registro)
+
+for nome_arquivo, registros in (
+        ("aprovados.txt", aprovados),
+        ("exame.txt", exame),
+        ("reprovados.txt", reprovados),
+    ):
+        with open(nome_arquivo, "w", encoding="utf-8") as saida:
+            saida.writelines(registros)
+
+    print("Classificação concluída:")
+    print(f"  Aprovados : {len(aprovados)}  -> aprovados.txt")
+    print(f"  Exame     : {len(exame)}  -> exame.txt")
+    print(f"  Reprovados: {len(reprovados)}  -> reprovados.txt")
+
+
+if __name__ == "__main__":
+    main()
