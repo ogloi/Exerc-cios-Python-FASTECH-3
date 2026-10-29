@@ -1,0 +1,42 @@
+ARQUIVO = "notas.txt"
+
+
+def ler_nota(mensagem):
+    """Pede uma nota entre 0 e 10 e repete até o usuário digitar um valor válido."""
+    while True:
+        texto = input(mensagem).strip().replace(",", ".")
+        try:
+            nota = float(texto)
+        except ValueError:
+            print("  Valor inválido. Digite um número (ex.: 7.5).")
+            continue
+        if 0 <= nota <= 10:
+            return nota
+        print("  A nota deve estar entre 0 e 10.")
+
+
+def main():
+    print("=== Cadastro de notas ===")
+    with open(ARQUIVO, "a", encoding="utf-8") as arq:
+        while True:
+            nome = input("\nNome do aluno: ").strip()
+            if not nome:
+                print("  O nome não pode ficar vazio.")
+                continue
+
+            nota1 = ler_nota("Nota 1: ")
+            nota2 = ler_nota("Nota 2: ")
+            nota3 = ler_nota("Nota 3: ")
+
+            arq.write(f"{nome};{nota1};{nota2};{nota3}\n")
+            print(f"  Aluno {nome} salvo!")
+
+            outro = input("\nCadastrar outro aluno? (s/n): ").strip().lower()
+            if outro != "s":
+                break
+
+    print(f"\nDados salvos em {ARQUIVO}.")
+
+
+if __name__ == "__main__":
+    main()
